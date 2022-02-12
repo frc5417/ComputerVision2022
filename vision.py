@@ -3,7 +3,7 @@
 import cv2
 import numpy as np
 
-cap = cv2.VideoCapture(1)
+cap = cv2.VideoCapture(0)
 
 # Check if the webcam is opened correctly
 if not cap.isOpened():
@@ -23,9 +23,13 @@ while True:
         for (x, y, r) in circles:
             # draw the circle in the output image, then draw a rectangle
             # corresponding to the center of the circle
-            cv2.circle(output, (x, y), r, (0, 0, 0), 4)
+            b,g,r = (frame[x, y])
+            if(b > r):
+                cv2.circle(output, (x, y), r, (255, 0, 0), 4)
+            else:
+                cv2.circle(output, (x, y), r, (0, 0, 255), 4)
             cv2.rectangle(output, (x - 5, y - 5), (x + 5, y + 5), (0, 128, 255), -1)
-        # show the output image
+    # show the output image
     cv2.imshow("output", output)
 
     c = cv2.waitKey(1)
