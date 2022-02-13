@@ -1,5 +1,6 @@
 # Imports:
 #import networktables
+from asyncio.windows_events import NULL
 import cv2
 import numpy as np
 
@@ -10,23 +11,32 @@ if not cap.isOpened():
     raise IOError("Cannot open webcam")
 
 while True:
+    frame = []
     ret, frame = cap.read()
     #frame = cv2.normalize(frame, None, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX)
     red = cv2.medianBlur(frame.copy(), 7)[:,:,2]
     #ret, red = cv2.threshold(red, 200, 255, cv2.THRESH_BINARY_INV)
     output = red.copy()
-    circles = cv2.HoughCircles(red, cv2.HOUGH_GRADIENT, 1, 100, param1=80, param2=60)
+    circles = cv2.HoughCircles(red, cv2.HOUGH_GRADIENT, 1, 150, param1=80, param2=60,minRadius=10)
     if circles is not None:
         # convert the (x, y) coordinates and radius of the circles to integers
         circles = np.round(circles[0, :]).astype("int")
         # loop over the (x, y) coordinates and radius of the circles
         for (x, y, r) in circles:
+            if(x >= frame.shape[0]-1 or y >= frame.shape[1]-1):
+                continue
+
             # draw the circle in the output image, then draw a rectangle
             # corresponding to the center of the circle
-            cv2.circle(output, (x, y), r, (0, 0, 0), 4)
-            cv2.rectangle(output, (x - 5, y - 5), (x + 5, y + 5), (0, 128, 255), -1)
-        # show the output image
-    cv2.imshow("output", output)
+            b,g,redcolor = (frame[y, x]).astype(int)
+
+            if(b > redcolor):
+                cv2.circle(frame, (x, y), r, (255, 0, 0), 4)
+            else:
+                cv2.circle(frame, (x, y), r, (0, 0, 255), 4)
+            cv2.rectangle(frame, (x - 5, y - 5), (x + 5, y + 5), (0, 128, 255), -1)
+    # show the output image
+    cv2.imshow("output", frame)
 
     c = cv2.waitKey(1)
     if c == 27:
