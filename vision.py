@@ -1,15 +1,17 @@
 # Imports:
 #import networktables
+#from asyncio.windows_events import NULL
 import cv2
 import numpy as np
 
-cap = cv2.VideoCapture(2)
+cap = cv2.VideoCapture(0)
 
 # Check if the webcam is opened correctly
 if not cap.isOpened():
     raise IOError("Cannot open webcam")
 
 while True:
+    frame = []
     ret, frame = cap.read()
     #frame = cv2.normalize(frame, None, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX)
     blur = cv2.medianBlur(frame, 9)
@@ -23,6 +25,9 @@ while True:
         circles = np.round(circles[0, :]).astype("int")
         # loop over the (x, y) coordinates and radius of the circles
         for (x, y, r) in circles:
+            if(x >= frame.shape[0]-1 or y >= frame.shape[1]-1):
+                continue
+
             # draw the circle in the output image, then draw a rectangle
             # corresponding to the center of the circle
             if x < r or y < r or x > frame.shape[1] - r or y > frame.shape[0] - r:
