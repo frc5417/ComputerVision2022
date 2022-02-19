@@ -4,19 +4,21 @@
 import cv2
 import numpy as np
 
-cap = cv2.VideoCapture(1)
+cap = cv2.VideoCapture(2)
 
 # Check if the webcam is opened correctly
 if not cap.isOpened():
     raise IOError("Cannot open webcam")
+
+channel = 2
 
 while True:
     frame = []
     ret, frame = cap.read()
     #frame = cv2.normalize(frame, None, alpha=0, beta=255, norm_type=cv2.NORM_MINMAX)
     blur = cv2.medianBlur(frame, 9)
-    red = blur[:,:,2]
-    blue = blur[:,:,0]
+    red = blur[:,:,channel]
+    blue = blur[:,:,channel]
     #ret, red = cv2.threshold(red, 200, 255, cv2.THRESH_BINARY_INV)
     output = frame.copy()
     circles = cv2.HoughCircles(red, cv2.HOUGH_GRADIENT, 1, 200, param1=60, param2=30)
@@ -42,11 +44,12 @@ while True:
             bsum = int(np.sum(cframe[:,:,0]))
             gsum = int(np.sum(cframe[:,:,1]))
             tsum = rsum + bsum + gsum
+            sums = [bsum, gsum, rsum]
             if tsum == 0:
                 continue
-            print(str(rsum) + ' ' + str(tsum))
-            if rsum / tsum > 0.69:
-                cv2.putText(output, str(round(rsum/tsum, 3)), (x-r-5, y-r), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), thickness=3)
+            print(str(sums[channel]) + ' ' + str(tsum))
+            if sums[channel] / tsum > [0.43, 1.00, 0.59][channel]:
+                cv2.putText(output, str(round(sums[channel]/tsum, 3)), (x-r-5, y-r), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), thickness=3)
                 cv2.circle(output, (x, y), r, (0, 0, 0), 4)
                 cv2.rectangle(output, (x - 5, y - 5), (x + 5, y + 5), (0, 128, 255), -1)
                 cv2.rectangle(output, (x-r, y-r), (x+r, y+r), (0, 0, 255), 5)
