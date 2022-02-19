@@ -4,7 +4,7 @@
 import cv2
 import numpy as np
 
-cap = cv2.VideoCapture(0)
+cap = cv2.VideoCapture(1)
 
 # Check if the webcam is opened correctly
 if not cap.isOpened():
@@ -45,7 +45,7 @@ while True:
             if tsum == 0:
                 continue
             print(str(rsum) + ' ' + str(tsum))
-            if rsum / tsum > 0.4:
+            if rsum / tsum > 0.69:
                 cv2.putText(output, str(round(rsum/tsum, 3)), (x-r-5, y-r), cv2.FONT_HERSHEY_SIMPLEX, 1, (255,255,255), thickness=3)
                 cv2.circle(output, (x, y), r, (0, 0, 0), 4)
                 cv2.rectangle(output, (x - 5, y - 5), (x + 5, y + 5), (0, 128, 255), -1)
